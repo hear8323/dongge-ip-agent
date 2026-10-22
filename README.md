@@ -2,6 +2,14 @@
 
 > 免费开源 AI 口播视频生产工具 (Electron + Vue3) · 免费一键生成视频
 
+## ⬇️ 下载 Windows 版（普通用户看这条，双击即用）
+
+**直接下这个，约 126 MB，免安装：**
+
+👉 **[DonggeIP-Agent-v1.0.1-win-x64.exe](https://github.com/hear8323/dongge-ip-agent/releases/download/1.0.1/DonggeIP-Agent-v1.0.1-win-x64.exe)**
+
+> ⚠️ **别点仓库里的「Code → Download ZIP」**——那是**源代码**（二三十 MB），没有打包好的程序，双击跑不起来。要能用的话，请认准上面那个 `.exe`。
+
 - 微信：hgb553322
 
 一个把爆款口播视频流水线装进桌面的 AI 工具。
@@ -69,13 +77,20 @@
 - 每天赠送 **100 次**免费 AI 模型调用
 - 授权过期后重新点一次「重新授权」即可
 
-## 三、下载安装
+## 三、下载安装（下下来打不开？先看这条）
 
-到本仓库的 [Releases](../../releases) 页面下载最新版本：
+**九成的「下下来跑不起来」都是下错了文件**——请认准下面的 `.exe`，不要下源码。
 
-| 文件 | 适用系统 |
-| --- | --- |
-| `DonggeIP-Agent-vX.Y.Z-win-x64.exe` | Windows 10/11 64 位，免安装，双击就能用 |
+1. 打开发布页：[Releases](https://github.com/hear8323/dongge-ip-agent/releases)
+2. 在最新版本（v1.0.1）的 **Assets** 里，点 `DonggeIP-Agent-v1.0.1-win-x64.exe`（约 126 MB）下载
+3. 双击 exe 即可运行，无需安装
+
+| 你看到的文件 | 能不能直接用 | 说明 |
+| --- | --- | --- |
+| `DonggeIP-Agent-v1.0.1-win-x64.exe` | ✅ 能 | Windows 便携版，双击即用 |
+| `Source code (zip)` / `Source code (tar.gz)` | ❌ 不能 | 这是源代码，需要 `npm install` + 打包才能跑，普通用户别下 |
+
+> ⚠️ 仓库主页绿色的「Code」按钮下面的「Download ZIP」也是**源码**，不是程序，请勿下载。
 
 Windows 首次运行如果被杀毒软件拦截，把程序所在文件夹加入白名单即可。
 
