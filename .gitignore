@@ -1,0 +1,11 @@
+node_modules
+out
+dist
+.build-tmp
+__dev_moark.json
+.vite
+*.log
+*.local
+*.tsbuildinfo
+.DS_Store
+Thumbs.db

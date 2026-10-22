@@ -1,0 +1,168 @@
+/**
+ * 暗黑主题全局覆盖
+ * 统一颜色变量 + Element Plus 主题定制
+ */
+
+:root {
+  /* === 暗黑色板 === */
+  --bg-primary: #0F172A;      /* 主背景 */
+  --bg-secondary: #1E293B;     /* 次级背景 */
+  --bg-card: #1B2336;          /* 卡片背景 */
+  --bg-card-hover: #212B42;    /* 卡片悬停 */
+  --bg-input: #0F172A;         /* 输入框背景 */
+  --bg-modal: #1B2336;         /* 弹窗背景 */
+  
+  --border-color: #272F42;     /* 边框 */
+  --border-active: #3B82F6;    /* 聚焦边框 */
+  
+  --text-primary: #F8FAFC;     /* 主文字 */
+  --text-secondary: #94A3B8;   /* 次要文字 */
+  --text-muted: #64748B;       /* 弱文字 */
+  
+  --accent-primary: #3B82F6;   /* 主色调 */
+  --accent-secondary: #22C55E; /* 成功/次要 */
+  --accent-warning: #F59E0B;   /* 警告 */
+  --accent-danger: #EF4444;    /* 危险 */
+  
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* === Element Plus 暗黑覆盖 === */
+.el-button--primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+  border-color: transparent !important;
+}
+
+.el-button--primary:hover {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+}
+
+.el-input__wrapper,
+.el-textarea__inner {
+  background: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 0 0 1px var(--border-color) !important;
+}
+
+.el-input__wrapper:hover,
+.el-textarea__inner:hover {
+  border-color: var(--accent-primary) !important;
+}
+
+.el-input__wrapper.is-focus,
+.el-textarea__inner.is-focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 1px var(--accent-primary) !important;
+}
+
+.el-select .el-input__wrapper {
+  background: var(--bg-input) !important;
+}
+
+.el-dialog {
+  background: var(--bg-modal) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.el-dialog__title {
+  color: var(--text-primary) !important;
+}
+
+.el-dialog__body {
+  color: var(--text-secondary) !important;
+}
+
+.el-form-item__label {
+  color: var(--text-secondary) !important;
+}
+
+.el-table {
+  background: var(--bg-card) !important;
+}
+
+.el-table th,
+.el-table td {
+  background: var(--bg-card) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.el-table th {
+  color: var(--text-primary) !important;
+}
+
+.el-table__row:hover > td {
+  background: var(--bg-card-hover) !important;
+}
+
+.el-tabs__item {
+  color: var(--text-secondary) !important;
+}
+
+.el-tabs__item.is-active {
+  color: var(--accent-primary) !important;
+}
+
+.el-divider {
+  border-top-color: var(--border-color) !important;
+}
+
+.el-tag {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.el-tag--success {
+  background: rgba(34, 197, 94, 0.15) !important;
+  border-color: var(--accent-secondary) !important;
+  color: var(--accent-secondary) !important;
+}
+
+.el-tag--danger {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: var(--accent-danger) !important;
+  color: var(--accent-danger) !important;
+}
+
+.el-message {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.el-message__content {
+  color: var(--text-primary) !important;
+}
+
+.el-progress-bar__outer {
+  background: #334155 !important;
+}
+
+.el-progress-bar__inner {
+  background: var(--accent-primary) !important;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
