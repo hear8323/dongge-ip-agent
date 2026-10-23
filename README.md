@@ -96,9 +96,20 @@ Windows 首次运行如果被杀毒软件拦截，把程序所在文件夹加入
 
 其他平台可参照源码自行构建（Electron + Vue 3，`npm install` 后 `npm run build`）。
 
-## 四、AI 对口型（本地模型部署）
+## 四、AI 对口型（数字人功能）
 
-对口型算力目前需要自己部署调用，步骤如下：
+### 方式1: Kling AI（推荐，免费每日166积分）
+
+无需租卡，直接在App内配置即可使用：
+
+1. 点击右上角【模型配置】
+2. 选择模式：「🎬 Kling AI（免费，每日166积分）」
+3. 填入 API Key（从 https://app.klingai.com/ 获取）
+4. 填入 Session ID（浏览器F12 → Application → Local Storage → session_id）
+5. 点击「保存配置」，重启App
+6. 代理服务自动启动在 `http://127.0.0.1:8899`
+
+### 方式2: 自建 duix 服务（免费，需GPU）
 
 - 第 1 步：**本地有显卡的电脑** 或 **租有显卡的云主机**（推荐显存 **6G+**）
 - 第 2 步：安装 Docker
