@@ -194,7 +194,7 @@ if (typeof window !== 'undefined' && !window.desktopApi) {
     submitLipSyncDedicatedTask: () => Promise.resolve(null),
     cancelLipSyncDedicatedTask: () => Promise.resolve(false),
     onLipSyncDedicatedStatus: () => () => {},
-    // 数字人代理（Kling AI 等第三方 API）
+    // 数字人代理（速创 API 等第三方 API）
     loadLipSyncProxyConfig: () => Promise.resolve(null),
     saveLipSyncProxyConfig: () => Promise.resolve(),
     recognizeSubtitles: () => Promise.resolve(null),

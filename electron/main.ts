@@ -618,7 +618,7 @@ app.whenReady().then(() => {
   registerLocalAudioProtocol();
   registerLocalPipProtocol();
 
-  // 启动数字人代理服务器（Kling AI 等第三方 API 接入）
+  // 启动数字人代理服务器（速创 API 等第三方 接入）
   const proxyServer = startProxyServer((status: string) => {
     // 代理内部状态广播给所有窗口
     BrowserWindow.getAllWindows().forEach((win) => {
@@ -1103,7 +1103,7 @@ app.whenReady().then(() => {
     return true;
   });
 
-  // ===== 数字人代理配置（Kling AI 等第三方 API） =====
+  // ===== 数字人代理配置（速创 API 等第三方） =====
   ipcMain.handle("lipsync-proxy:load-config", async () => {
     return loadProxyConfig();
   });

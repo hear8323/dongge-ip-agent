@@ -8,22 +8,18 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 export interface ProxyLipSyncConfig {
   /** 代理服务器地址（通常填 http://127.0.0.1:8899） */
   baseUrl: string;
-  /** 代理模式：dedicated（直连自建）| kling（Kling AI） */
-  providerMode: "dedicated" | "kling";
-  /** Kling AI Access Key */
-  klingAccessKey?: string;
-  /** Kling AI Secret Key */
-  klingSecretKey?: string;
-  /** Kling AI JWT Token（可选，自动生成） */
-  klingToken?: string;
-  /** Kling AI 基础 URL（国内用北京节点） */
-  klingBaseUrl?: string;
+  /** 代理模式：dedicated（直连自建）| suochuang（速创API） */
+  providerMode: "dedicated" | "suochuang";
+  /** 速创 API Key */
+  suochuangApiKey?: string;
+  /** 速创 API 基础 URL */
+  suochuangBaseUrl?: string;
 }
 
 const DEFAULT_CONFIG: ProxyLipSyncConfig = {
   baseUrl: "",
   providerMode: "dedicated",
-  klingBaseUrl: "https://api-beijing.klingai.com",
+  suochuangBaseUrl: "https://api.wuyinkeji.com",
 };
 
 export function getDefaultConfig(): ProxyLipSyncConfig {

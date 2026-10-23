@@ -2,11 +2,11 @@
  * 数字人代理中间层（TransDhServer 协议 → 第三方 API）
  *
  * 将东哥IP智能体的 TransDhServer 协议（/upload、/submit、/query）
- * 转换为 Kling AI 的 API 调用，实现零代码接入第三方数字人服务。
+ * 转换为速创 API 的调用，实现零代码接入数字人服务。
  *
  * 支持模式：
  *   - dedicated: 直连自建 duix 服务（原逻辑）
- *   - kling: 代理到 Kling AI（免费额度每日166积分）
+ *   - suochuang: 代理到速创 API（0.01元/秒，成功才计费）
  */
 
 import { join } from "node:path";
@@ -14,18 +14,16 @@ import { randomUUID } from "node:crypto";
 import { app } from "electron";
 import { writeFile } from "node:fs/promises";
 import { logInfo, logError } from "../_shared/logger";
-import { submitKlingTask, pollKlingTask } from "./kling-provider";
+import { submitSuochuangTask, pollSuochuangTask } from "./suochuang-provider";
 import type { DedicatedLipSyncConfig } from "../lip-sync-dedicated/types";
 
 const LOG_TAG = "lipsync-proxy";
 const HTTP_PORT = 8899;
 
 export interface ProxyConfig extends DedicatedLipSyncConfig {
-  providerMode: "dedicated" | "kling";
-  klingAccessKey?: string;
-  klingSecretKey?: string;
-  klingToken?: string;
-  klingBaseUrl?: string;
+  providerMode: "dedicated" | "suochuang";
+  suochuangApiKey?: string;
+  suochuangBaseUrl?: string;
 }
 
 const pendingTasks = new Map<string, { taskId: string; signal: AbortController }>();
@@ -73,34 +71,22 @@ export function startProxyServer(onStatus: (status: string) => void) {
           res.end(JSON.stringify({ code: -1, msg: "缺少参数" }));
           return;
         }
-        if (config.providerMode !== "kling") {
+        if (config.providerMode !== "suochuang") {
           res.writeHead(501);
-          res.end(JSON.stringify({ code: -1, msg: "仅支持 kling 模式" }));
+          res.end(JSON.stringify({ code: -1, msg: "仅支持 suochuang 模式" }));
           return;
         }
-        if (config.providerMode !== "kling") {
-          res.writeHead(501);
-          res.end(JSON.stringify({ code: -1, msg: "仅支持 kling 模式" }));
-          return;
-        }
-        const klingCfg: any = {
-          accessKey: config.klingAccessKey || "",
-          secretKey: config.klingSecretKey || "",
-          token: config.klingToken || undefined,
-          baseUrl: config.klingBaseUrl || "https://api-beijing.klingai.com",
-          faceId: "0",
-          soundVolume: 2,
-          originalAudioVolume: 2,
-          soundInsertTime: 0,
-          soundStartTime: 0,
+        const scCfg = {
+          apiKey: config.suochuangApiKey || "",
+          baseUrl: config.suochuangBaseUrl || "https://api.wuyinkeji.com",
         };
-        if (!klingCfg.accessKey || !klingCfg.secretKey) {
+        if (!scCfg.apiKey) {
           res.writeHead(400);
-          res.end(JSON.stringify({ code: -1, msg: "请配置 Access Key 和 Secret Key" }));
+          res.end(JSON.stringify({ code: -1, msg: "请配置 API Key" }));
           return;
         }
-        onStatus("提交 Kling AI 任务...");
-        const { taskId } = await submitKlingTask(klingCfg, audio_url, video_url);
+        onStatus("提交速创任务...");
+        const { taskId } = await submitSuochuangTask(scCfg, audio_url, video_url);
         pendingTasks.set(code, { taskId, signal: new AbortController() });
         res.writeHead(200);
         res.end(JSON.stringify({ code: 0, msg: "success" }));
@@ -118,18 +104,11 @@ export function startProxyServer(onStatus: (status: string) => void) {
         }
         onStatus("轮询任务状态...");
         try {
-          const klingCfg: any = {
-            accessKey: config.klingAccessKey || "",
-            secretKey: config.klingSecretKey || "",
-            token: config.klingToken || undefined,
-            baseUrl: config.klingBaseUrl || "https://api-beijing.klingai.com",
-            faceId: "0",
-            soundVolume: 2,
-            originalAudioVolume: 2,
-            soundInsertTime: 0,
-            soundStartTime: 0,
+          const scCfg = {
+            apiKey: config.suochuangApiKey || "",
+            baseUrl: config.suochuangBaseUrl || "https://api.wuyinkeji.com",
           };
-          const resultUrl = await pollKlingTask(klingCfg, task.taskId, task.signal.signal);
+          const resultUrl = await pollSuochuangTask(scCfg, task.taskId, task.signal.signal);
           const path = await downloadVideo(resultUrl);
           pendingTasks.delete(taskCode);
           res.writeHead(200);

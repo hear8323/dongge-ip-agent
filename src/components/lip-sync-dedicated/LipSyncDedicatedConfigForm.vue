@@ -4,13 +4,12 @@ import { useLipSyncDedicated } from '@/composables/lip-sync-dedicated/useLipSync
 
 const { config: dedicatedConfig, refreshConfig: refreshDedicatedConfig } = useLipSyncDedicated()
 
-// 代理配置（Kling AI 等第三方 API）
+// 代理配置（速创 API 等第三方 API）
 const proxyConfig = ref({
   baseUrl: 'http://127.0.0.1:8899',
-  providerMode: 'kling' as 'dedicated' | 'kling',
-  klingAccessKey: '',
-  klingSecretKey: '',
-  klingBaseUrl: 'https://api-beijing.klingai.com',
+  providerMode: 'suochuang' as 'dedicated' | 'suochuang',
+  suochuangApiKey: '',
+  suochuangBaseUrl: 'https://api.wuyinkeji.com',
 })
 
 async function loadProxyConfig() {
@@ -28,7 +27,7 @@ async function saveProxyConfig() {
   try {
     await window.desktopApi.saveLipSyncProxyConfig(proxyConfig.value)
     // 切换模式时更新 baseUrl
-    if (proxyConfig.value.providerMode === 'kling') {
+    if (proxyConfig.value.providerMode === 'suochuang') {
       dedicatedConfig.baseUrl = proxyConfig.value.baseUrl
     } else {
       dedicatedConfig.baseUrl = ''
@@ -41,11 +40,11 @@ async function saveProxyConfig() {
   }
 }
 
-const isKling = computed(() => proxyConfig.value.providerMode === 'kling')
+const isSuochuang = computed(() => proxyConfig.value.providerMode === 'suochuang')
 
-// 提示 Kling AI 获取方式
-const klingHelp = `1. 登录 https://app.klingai.com/ 获取 API Key
-2. 登录后从浏览器 localStorage 获取 session_id（按 F12 → Application → Local Storage）`
+// 提示速创 API 获取方式
+const suochuangHelp = `1. 注册 https://api.wuyinkeji.com/ 获取 API Key
+2. 在控制台 → 密钥管理查看你的 API Key`
 
 loadProxyConfig()
 </script>
@@ -58,44 +57,35 @@ loadProxyConfig()
         请选择数字人服务模式：
       </p>
       <select v-model="proxyConfig.providerMode" class="mode-select">
-        <option value="kling">🎬 Kling AI（免费，每日166积分）</option>
+        <option value="suochuang">🎬 速创 API（0.01元/秒，成功才计费）</option>
         <option value="dedicated">⚙️ 自建 duix（需云卡/Docker）</option>
       </select>
     </div>
 
-    <!-- Kling AI 配置 -->
-    <template v-if="isKling">
+    <!-- 速创 API 配置 -->
+    <template v-if="isSuochuang">
       <div class="config-tip">
         <p class="config-tip-lead">
-          🎬 <strong>Kling AI 对口型</strong> — 免费额度每日 166 积分（约 30 分钟视频），国内可用，无需租卡
+          🎬 <strong>速创 API 对口型</strong> — 0.01元/秒（6毛/分钟），成功才计费，无并发限制
         </p>
-        <p style="color:#64748b;font-size:11px;margin-top:6px;">{{ klingHelp }}</p>
+        <p style="color:#64748b;font-size:11px;margin-top:6px;">{{ suochuangHelp }}</p>
       </div>
 
       <label class="config-field">
-        <span>Access Key *</span>
+        <span>API Key *</span>
         <input
-          v-model="proxyConfig.klingAccessKey"
+          v-model="proxyConfig.suochuangApiKey"
           type="password"
-          placeholder="从 https://app.klingai.com/ 获取"
-        />
-      </label>
-
-      <label class="config-field">
-        <span>Secret Key *</span>
-        <input
-          v-model="proxyConfig.klingSecretKey"
-          type="password"
-          placeholder="从 https://app.klingai.com/ 获取"
+          placeholder="从 https://api.wuyinkeji.com/ 获取"
         />
       </label>
 
       <label class="config-field">
         <span>API 地址</span>
         <input
-          v-model="proxyConfig.klingBaseUrl"
+          v-model="proxyConfig.suochuangBaseUrl"
           type="text"
-          placeholder="https://api-beijing.klingai.com"
+          placeholder="https://api.wuyinkeji.com"
         />
       </label>
 
