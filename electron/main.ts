@@ -81,6 +81,13 @@ const autoVideoControllers = new Map<number, AbortController>();
 const douyinExtractionControllers = new Map<number, AbortController>();
 const moarkSynthesisControllers = new Map<number, AbortController>();
 const subtitleRecognitionControllers = new Map<number, AbortController>();
+import {
+  loadProxyConfig,
+  saveProxyConfig as saveProxyLipSyncConfig,
+  startProxyServer,
+} from "./services/lip-sync-proxy/index";
+import type { ProxyLipSyncConfig } from "./services/lip-sync-proxy/config";
+
 const dedicatedLipSyncControllers = new Map<number, AbortController>();
 
 protocol.registerSchemesAsPrivileged([
@@ -611,6 +618,17 @@ app.whenReady().then(() => {
   registerLocalAudioProtocol();
   registerLocalPipProtocol();
 
+  // 启动数字人代理服务器（Kling AI 等第三方 API 接入）
+  const proxyServer = startProxyServer((status: string) => {
+    // 代理内部状态广播给所有窗口
+    BrowserWindow.getAllWindows().forEach((win) => {
+      win.webContents.send("lipsync-proxy:status", status);
+    });
+  });
+  proxyServer.on("error", (err: NodeJS.ErrnoException) => {
+    console.error("[lipsync-proxy] 启动失败:", err.message);
+  });
+
   ipcMain.handle("app:get-version", () => app.getVersion());
   ipcMain.handle("app:request-microphone-access", async () => {
     // macOS 需要通过系统权限请求麦克风访问
@@ -1084,6 +1102,17 @@ app.whenReady().then(() => {
     }
     return true;
   });
+
+  // ===== 数字人代理配置（Kling AI 等第三方 API） =====
+  ipcMain.handle("lipsync-proxy:load-config", async () => {
+    return loadProxyConfig();
+  });
+  ipcMain.handle(
+    "lipsync-proxy:save-config",
+    (_event, config: ProxyLipSyncConfig) => {
+      saveProxyLipSyncConfig(config);
+    },
+  );
   ipcMain.handle("subtitle:recognize", (event, audioUrl: string) =>
     recognizeSubtitles(event.sender.id, audioUrl),
   );

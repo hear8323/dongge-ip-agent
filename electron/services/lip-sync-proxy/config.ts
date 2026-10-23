@@ -1,0 +1,48 @@
+/**
+ * 数字人代理中间层配置
+ */
+import { join } from "node:path";
+import { app } from "electron";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+
+export interface ProxyLipSyncConfig {
+  /** 代理服务器地址（通常填 http://127.0.0.1:8899） */
+  baseUrl: string;
+  /** 代理模式：dedicated（直连自建）| kling（Kling AI） */
+  providerMode: "dedicated" | "kling";
+  /** Kling AI API Key */
+  klingApiKey?: string;
+  /** Kling AI 会话 ID（用户在 app.klingai.com 的 session_id） */
+  klingSessionId?: string;
+  /** Kling AI 基础 URL（国内用北京节点） */
+  klingBaseUrl?: string;
+}
+
+const DEFAULT_CONFIG: ProxyLipSyncConfig = {
+  baseUrl: "",
+  providerMode: "dedicated",
+  klingBaseUrl: "https://api-beijing.klingai.com",
+};
+
+export function getDefaultConfig(): ProxyLipSyncConfig {
+  return { ...DEFAULT_CONFIG };
+}
+
+export function getConfigPath(): string {
+  return join(app.getPath("userData"), "lip-sync-proxy-config.json");
+}
+
+export async function loadProxyConfig(): Promise<ProxyLipSyncConfig> {
+  try {
+    const data = await readFile(getConfigPath(), "utf-8");
+    const parsed = JSON.parse(data) as Partial<ProxyLipSyncConfig>;
+    return { ...getDefaultConfig(), ...parsed };
+  } catch {
+    return getDefaultConfig();
+  }
+}
+
+export async function saveProxyConfig(config: ProxyLipSyncConfig): Promise<void> {
+  await mkdir(app.getPath("userData"), { recursive: true });
+  await writeFile(getConfigPath(), JSON.stringify(config, null, 2), "utf-8");
+}

@@ -69,6 +69,10 @@ declare global {
         callback: (status: string) => void,
       ) => () => void;
 
+      // 数字人代理（Kling AI 等第三方 API）
+      loadLipSyncProxyConfig: () => Promise<unknown>;
+      saveLipSyncProxyConfig: (config: unknown) => Promise<void>;
+
       // 字幕识别
       recognizeSubtitles: (audioUrl: string) => Promise<unknown>;
       cancelSubtitleRecognition: () => Promise<boolean>;

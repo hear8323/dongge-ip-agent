@@ -15,3 +15,9 @@ export function logInfo(tag: string, message: string): void {
     appendFileSync(getLogPath(), `[${formatTime()}] [INFO] [${tag}] ${message}\n`, "utf-8");
   } catch { /* ignore */ }
 }
+
+export function logError(tag: string, message: string): void {
+  try {
+    appendFileSync(getLogPath(), `[${formatTime()}] [ERROR] [${tag}] ${message}\n`, "utf-8");
+  } catch { /* ignore */ }
+}
