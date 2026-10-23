@@ -5,7 +5,7 @@
  * 一次授权（登录 + 自动获取访问令牌），四步功能即可全部使用。
  */
 import { Select, Loading, RefreshRight, SwitchButton } from '@element-plus/icons-vue'
-import { useMoarkAccount } from '@/composables/useMoarkAccount'
+import { useMoarkAccount, MOARK_PURCHASE_URL } from '@/composables/useMoarkAccount'
 
 import { computed } from 'vue'
 
@@ -42,6 +42,11 @@ const quotaPercent = computed(() => {
 
 /** 剩余次数偏低时用警示色（少于 20%） */
 const isQuotaLow = computed(() => hasQuota.value && quotaPercent.value < 20)
+
+/** 积分不够用（今日免费额度已用完） */
+const isQuotaExhausted = computed(
+  () => hasQuota.value && (quotaRemaining.value ?? 1) <= 0,
+)
 </script>
 
 <template>
@@ -92,7 +97,11 @@ const isQuotaLow = computed(() => hasQuota.value && quotaPercent.value < 20)
                   :style="{ width: `${quotaPercent}%` }"
                 ></div>
               </div>
-              <p v-if="isQuotaLow" class="cc-quota-tip">
+              <p v-if="isQuotaExhausted" class="cc-quota-buy">
+                今日免费额度已用完，
+                <a :href="MOARK_PURCHASE_URL" target="_blank" rel="noopener">去购买 / 充值 ›</a>
+              </p>
+              <p v-else-if="isQuotaLow" class="cc-quota-tip">
                 剩余次数不多，次日 0 点自动重置
               </p>
             </template>
@@ -368,6 +377,29 @@ const isQuotaLow = computed(() => hasQuota.value && quotaPercent.value < 20)
   color: #d9694f;
   font-size: 11px;
   line-height: 1.5;
+}
+
+/* 额度用尽：购买 / 充值引导 */
+.cc-quota-buy {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #d9694f;
+  background: #fdf0ed;
+  border: 1px solid #f6d8d0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cc-quota-buy a {
+  color: #2a6f97;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cc-quota-buy a:hover {
+  text-decoration: underline;
 }
 
 .cc-quota-empty {

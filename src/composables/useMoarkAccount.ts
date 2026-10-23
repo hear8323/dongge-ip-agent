@@ -42,6 +42,14 @@ export function isMoarkAuthError(message: string): boolean {
   );
 }
 
+/**
+ * 免费额度用尽后的「购买 / 充值」链接。
+ *
+ * 默认指向算力提供商 moark 官网；如果想引导用户去你自己的店铺 / 付费套餐页，
+ * 把下面这个字符串改成对应地址即可（一处生效，配置中心会自动展示）。
+ */
+export const MOARK_PURCHASE_URL = "https://moark.com";
+
 interface MoarkCallQuota {
   remaining: number;
   total: number;
