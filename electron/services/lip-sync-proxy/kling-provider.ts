@@ -3,14 +3,31 @@
  *
  * 将 TransDhServer 协议的 /submit 请求转换为 Kling AI 的 /v1/videos/advanced-lip-sync 调用，
  * 并将查询结果转回 TransDhServer 格式。
+ *
+ * 认证方式：JWT Bearer Token（Access Key + Secret Key 签名）
  */
 import { randomUUID } from "node:crypto";
+import * as crypto from "node:crypto";
 import { logInfo, logError } from "../_shared/logger";
 import type { KlingConfig, KlingResponse, KlingError } from "./types";
 
 const LOG_TAG = "lipsync-proxy-kling";
 const POLL_INTERVAL_MS = 8000; // 每 8 秒轮询一次
 const MAX_POLL_COUNT = 60; // 最多等 8 分钟
+
+/** 生成 JWT Token */
+function generateToken(accessKey: string, secretKey: string): string {
+  const now = Math.floor(Date.now() / 1000);
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(
+    JSON.stringify({ iss: accessKey, exp: now + 1800, nbf: now - 5 }),
+  ).toString("base64url");
+  const signature = crypto
+    .createHmac("sha256", secretKey)
+    .update(`${header}.${payload}`)
+    .digest("base64url");
+  return `${header}.${payload}.${signature}`;
+}
 
 /**
  * 提交对口型任务到 Kling AI
@@ -23,8 +40,11 @@ export async function submitKlingTask(
   audioUrl: string,
   videoUrl: string,
 ): Promise<{ taskId: string }> {
+  // 生成或复用 Token
+  const token = config.token || generateToken(config.accessKey, config.secretKey);
+
   const requestBody = {
-    session_id: config.sessionId,
+    session_id: "",
     face_choose: [
       {
         face_id: config.faceId,
@@ -46,7 +66,7 @@ export async function submitKlingTask(
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.apiKey}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
@@ -80,6 +100,7 @@ export async function pollKlingTask(
   taskId: string,
   signal?: AbortSignal,
 ): Promise<string> {
+  const token = config.token || generateToken(config.accessKey, config.secretKey);
   const url = `${config.baseUrl}/v1/videos/advanced-lip-sync/${taskId}`;
 
   for (let i = 0; i < MAX_POLL_COUNT; i++) {
@@ -94,7 +115,7 @@ export async function pollKlingTask(
     try {
       const response = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${config.apiKey}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

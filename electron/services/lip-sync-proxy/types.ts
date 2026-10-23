@@ -5,13 +5,18 @@
  * 供东哥IP智能体使用，无需改动前端代码。
  *
  * Kling AI API 文档: https://www.klingai.com/document-api/api/video/lip-sync
+ * 认证方式: JWT Bearer Token（Access Key + Secret Key 签名生成）
  */
 
 export interface KlingConfig {
-  /** Kling AI API Key，从 https://app.klingai.com/ 获取 */
-  apiKey: string;
-  /** 会话 ID（Kling AI 用户 ID） */
-  sessionId: string;
+  /** Kling AI Access Key（从 https://app.klingai.com/ 获取） */
+  accessKey: string;
+  /** Kling AI Secret Key */
+  secretKey: string;
+  /** JWT Token（可选，如果用户提供已生成的 Token 则直接使用） */
+  token?: string;
+  /** Kling AI 基础 URL，国内用北京节点 */
+  baseUrl: string;
   /** 面 ID，固定填 "0" */
   faceId: string;
   /** 声音音量，默认 2 */
@@ -24,8 +29,6 @@ export interface KlingConfig {
   soundStartTime: number;
   /** 声音结束时间（毫秒），不填则用音频时长 */
   soundEndTime?: number;
-  /** Kling AI 基础 URL，国内用北京节点 */
-  baseUrl: string;
 }
 
 export interface KlingResponse {

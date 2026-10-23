@@ -22,8 +22,9 @@ const HTTP_PORT = 8899;
 
 export interface ProxyConfig extends DedicatedLipSyncConfig {
   providerMode: "dedicated" | "kling";
-  klingApiKey?: string;
-  klingSessionId?: string;
+  klingAccessKey?: string;
+  klingSecretKey?: string;
+  klingToken?: string;
   klingBaseUrl?: string;
 }
 
@@ -77,10 +78,25 @@ export function startProxyServer(onStatus: (status: string) => void) {
           res.end(JSON.stringify({ code: -1, msg: "仅支持 kling 模式" }));
           return;
         }
-        const klingCfg: { apiKey: string; sessionId: string; baseUrl: string; faceId: string; soundVolume: number; originalAudioVolume: number; soundInsertTime: number; soundStartTime: number } = { apiKey: config.klingApiKey || "", sessionId: config.klingSessionId || "", baseUrl: config.klingBaseUrl || "https://api-beijing.klingai.com", faceId: "0", soundVolume: 2, originalAudioVolume: 2, soundInsertTime: 0, soundStartTime: 0 };
-        if (!klingCfg.apiKey || !klingCfg.sessionId) {
+        if (config.providerMode !== "kling") {
+          res.writeHead(501);
+          res.end(JSON.stringify({ code: -1, msg: "仅支持 kling 模式" }));
+          return;
+        }
+        const klingCfg: any = {
+          accessKey: config.klingAccessKey || "",
+          secretKey: config.klingSecretKey || "",
+          token: config.klingToken || undefined,
+          baseUrl: config.klingBaseUrl || "https://api-beijing.klingai.com",
+          faceId: "0",
+          soundVolume: 2,
+          originalAudioVolume: 2,
+          soundInsertTime: 0,
+          soundStartTime: 0,
+        };
+        if (!klingCfg.accessKey || !klingCfg.secretKey) {
           res.writeHead(400);
-          res.end(JSON.stringify({ code: -1, msg: "请配置 API Key 和 Session ID" }));
+          res.end(JSON.stringify({ code: -1, msg: "请配置 Access Key 和 Secret Key" }));
           return;
         }
         onStatus("提交 Kling AI 任务...");
@@ -102,7 +118,17 @@ export function startProxyServer(onStatus: (status: string) => void) {
         }
         onStatus("轮询任务状态...");
         try {
-          const klingCfg: { apiKey: string; sessionId: string; baseUrl: string; faceId: string; soundVolume: number; originalAudioVolume: number; soundInsertTime: number; soundStartTime: number } = { apiKey: config.klingApiKey || "", sessionId: config.klingSessionId || "", baseUrl: config.klingBaseUrl || "https://api-beijing.klingai.com", faceId: "0", soundVolume: 2, originalAudioVolume: 2, soundInsertTime: 0, soundStartTime: 0 };
+          const klingCfg: any = {
+            accessKey: config.klingAccessKey || "",
+            secretKey: config.klingSecretKey || "",
+            token: config.klingToken || undefined,
+            baseUrl: config.klingBaseUrl || "https://api-beijing.klingai.com",
+            faceId: "0",
+            soundVolume: 2,
+            originalAudioVolume: 2,
+            soundInsertTime: 0,
+            soundStartTime: 0,
+          };
           const resultUrl = await pollKlingTask(klingCfg, task.taskId, task.signal.signal);
           const path = await downloadVideo(resultUrl);
           pendingTasks.delete(taskCode);

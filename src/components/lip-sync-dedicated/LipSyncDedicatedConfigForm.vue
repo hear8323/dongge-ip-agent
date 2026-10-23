@@ -8,8 +8,8 @@ const { config: dedicatedConfig, refreshConfig: refreshDedicatedConfig } = useLi
 const proxyConfig = ref({
   baseUrl: 'http://127.0.0.1:8899',
   providerMode: 'kling' as 'dedicated' | 'kling',
-  klingApiKey: '',
-  klingSessionId: '',
+  klingAccessKey: '',
+  klingSecretKey: '',
   klingBaseUrl: 'https://api-beijing.klingai.com',
 })
 
@@ -73,20 +73,20 @@ loadProxyConfig()
       </div>
 
       <label class="config-field">
-        <span>API Key *</span>
+        <span>Access Key *</span>
         <input
-          v-model="proxyConfig.klingApiKey"
+          v-model="proxyConfig.klingAccessKey"
           type="password"
-          placeholder="sk-xxxxxxxxxxxx"
+          placeholder="从 https://app.klingai.com/ 获取"
         />
       </label>
 
       <label class="config-field">
-        <span>Session ID *</span>
+        <span>Secret Key *</span>
         <input
-          v-model="proxyConfig.klingSessionId"
-          type="text"
-          placeholder="从浏览器 localStorage 获取"
+          v-model="proxyConfig.klingSecretKey"
+          type="password"
+          placeholder="从 https://app.klingai.com/ 获取"
         />
       </label>
 

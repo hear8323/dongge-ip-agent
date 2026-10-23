@@ -10,10 +10,12 @@ export interface ProxyLipSyncConfig {
   baseUrl: string;
   /** 代理模式：dedicated（直连自建）| kling（Kling AI） */
   providerMode: "dedicated" | "kling";
-  /** Kling AI API Key */
-  klingApiKey?: string;
-  /** Kling AI 会话 ID（用户在 app.klingai.com 的 session_id） */
-  klingSessionId?: string;
+  /** Kling AI Access Key */
+  klingAccessKey?: string;
+  /** Kling AI Secret Key */
+  klingSecretKey?: string;
+  /** Kling AI JWT Token（可选，自动生成） */
+  klingToken?: string;
   /** Kling AI 基础 URL（国内用北京节点） */
   klingBaseUrl?: string;
 }
