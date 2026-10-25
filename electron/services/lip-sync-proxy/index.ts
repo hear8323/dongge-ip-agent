@@ -2,11 +2,12 @@
  * 数字人代理中间层（TransDhServer 协议 → 第三方 API）
  *
  * 将东哥IP智能体的 TransDhServer 协议（/upload、/submit、/query）
- * 转换为速创 API 的调用，实现零代码接入数字人服务。
+ * 转换为第三方 API 的调用，实现零代码接入数字人服务。
  *
  * 支持模式：
  *   - dedicated: 直连自建 duix 服务（原逻辑）
  *   - suochuang: 代理到速创 API（0.01元/秒，成功才计费）
+ *   - aliyun: 代理到阿里云 VideoRetalk（¥0.08/秒，新号30分钟免费）
  */
 
 import { join } from "node:path";
@@ -15,15 +16,17 @@ import { app } from "electron";
 import { writeFile } from "node:fs/promises";
 import { logInfo, logError } from "../_shared/logger";
 import { submitSuochuangTask, pollSuochuangTask } from "./suochuang-provider";
+import { submitAliyunTask, pollAliyunTask } from "./aliyun-provider";
 import type { DedicatedLipSyncConfig } from "../lip-sync-dedicated/types";
 
 const LOG_TAG = "lipsync-proxy";
 const HTTP_PORT = 8899;
 
 export interface ProxyConfig extends DedicatedLipSyncConfig {
-  providerMode: "dedicated" | "suochuang";
+  providerMode: "dedicated" | "suochuang" | "aliyun";
   suochuangApiKey?: string;
   suochuangBaseUrl?: string;
+  aliyunApiKey?: string;
 }
 
 const pendingTasks = new Map<string, { taskId: string; signal: AbortController }>();
@@ -71,22 +74,39 @@ export function startProxyServer(onStatus: (status: string) => void) {
           res.end(JSON.stringify({ code: -1, msg: "缺少参数" }));
           return;
         }
-        if (config.providerMode !== "suochuang") {
+
+        let taskId: string;
+        if (config.providerMode === "suochuang") {
+          const scCfg = {
+            apiKey: config.suochuangApiKey || "",
+            baseUrl: config.suochuangBaseUrl || "https://api.wuyinkeji.com",
+          };
+          if (!scCfg.apiKey) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ code: -1, msg: "请配置速创 API Key" }));
+            return;
+          }
+          onStatus("提交速创任务...");
+          const result = await submitSuochuangTask(scCfg, audio_url, video_url);
+          taskId = result.taskId;
+        } else if (config.providerMode === "aliyun") {
+          const alCfg = {
+            apiKey: config.aliyunApiKey || "",
+          };
+          if (!alCfg.apiKey) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ code: -1, msg: "请配置阿里云 API Key" }));
+            return;
+          }
+          onStatus("提交阿里云 VideoRetalk 任务...");
+          const result = await submitAliyunTask(alCfg, audio_url, video_url);
+          taskId = result.taskId;
+        } else {
           res.writeHead(501);
-          res.end(JSON.stringify({ code: -1, msg: "仅支持 suochuang 模式" }));
+          res.end(JSON.stringify({ code: -1, msg: "仅支持 suochuang 或 aliyun 模式" }));
           return;
         }
-        const scCfg = {
-          apiKey: config.suochuangApiKey || "",
-          baseUrl: config.suochuangBaseUrl || "https://api.wuyinkeji.com",
-        };
-        if (!scCfg.apiKey) {
-          res.writeHead(400);
-          res.end(JSON.stringify({ code: -1, msg: "请配置 API Key" }));
-          return;
-        }
-        onStatus("提交速创任务...");
-        const { taskId } = await submitSuochuangTask(scCfg, audio_url, video_url);
+
         pendingTasks.set(code, { taskId, signal: new AbortController() });
         res.writeHead(200);
         res.end(JSON.stringify({ code: 0, msg: "success" }));
@@ -104,11 +124,21 @@ export function startProxyServer(onStatus: (status: string) => void) {
         }
         onStatus("轮询任务状态...");
         try {
-          const scCfg = {
-            apiKey: config.suochuangApiKey || "",
-            baseUrl: config.suochuangBaseUrl || "https://api.wuyinkeji.com",
-          };
-          const resultUrl = await pollSuochuangTask(scCfg, task.taskId, task.signal.signal);
+          let resultUrl: string;
+          if (config.providerMode === "suochuang") {
+            const scCfg = {
+              apiKey: config.suochuangApiKey || "",
+              baseUrl: config.suochuangBaseUrl || "https://api.wuyinkeji.com",
+            };
+            resultUrl = await pollSuochuangTask(scCfg, task.taskId, task.signal.signal);
+          } else if (config.providerMode === "aliyun") {
+            const alCfg = {
+              apiKey: config.aliyunApiKey || "",
+            };
+            resultUrl = await pollAliyunTask(alCfg, task.taskId, task.signal.signal);
+          } else {
+            throw new Error("不支持的模式");
+          }
           const path = await downloadVideo(resultUrl);
           pendingTasks.delete(taskCode);
           res.writeHead(200);

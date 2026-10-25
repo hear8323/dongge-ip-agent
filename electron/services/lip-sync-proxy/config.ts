@@ -8,12 +8,14 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 export interface ProxyLipSyncConfig {
   /** 代理服务器地址（通常填 http://127.0.0.1:8899） */
   baseUrl: string;
-  /** 代理模式：dedicated（直连自建）| suochuang（速创API） */
-  providerMode: "dedicated" | "suochuang";
+  /** 代理模式：dedicated（直连自建）| suochuang（速创API）| aliyun（阿里云VideoRetalk） */
+  providerMode: "dedicated" | "suochuang" | "aliyun";
   /** 速创 API Key */
   suochuangApiKey?: string;
   /** 速创 API 基础 URL */
   suochuangBaseUrl?: string;
+  /** 阿里云 API Key（DASHSCOPE_API_KEY） */
+  aliyunApiKey?: string;
 }
 
 const DEFAULT_CONFIG: ProxyLipSyncConfig = {

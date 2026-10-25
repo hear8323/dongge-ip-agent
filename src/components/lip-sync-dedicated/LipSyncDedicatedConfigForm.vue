@@ -4,10 +4,11 @@ import { useLipSyncDedicated } from '@/composables/lip-sync-dedicated/useLipSync
 
 const { config: dedicatedConfig, refreshConfig: refreshDedicatedConfig } = useLipSyncDedicated()
 
-// 代理配置（速创 API 等第三方 API）
+// 代理配置（阿里云、速创 API 等第三方 API）
 const proxyConfig = ref({
   baseUrl: 'http://127.0.0.1:8899',
-  providerMode: 'suochuang' as 'dedicated' | 'suochuang',
+  providerMode: 'aliyun' as 'dedicated' | 'suochuang' | 'aliyun',
+  aliyunApiKey: '',
   suochuangApiKey: '',
   suochuangBaseUrl: 'https://api.wuyinkeji.com',
 })
@@ -27,7 +28,7 @@ async function saveProxyConfig() {
   try {
     await window.desktopApi.saveLipSyncProxyConfig(proxyConfig.value)
     // 切换模式时更新 baseUrl
-    if (proxyConfig.value.providerMode === 'suochuang') {
+    if (proxyConfig.value.providerMode === 'aliyun' || proxyConfig.value.providerMode === 'suochuang') {
       dedicatedConfig.baseUrl = proxyConfig.value.baseUrl
     } else {
       dedicatedConfig.baseUrl = ''
@@ -40,7 +41,13 @@ async function saveProxyConfig() {
   }
 }
 
+const isAliyun = computed(() => proxyConfig.value.providerMode === 'aliyun')
 const isSuochuang = computed(() => proxyConfig.value.providerMode === 'suochuang')
+
+// 提示阿里云获取方式
+const aliyunHelp = `1. 注册 https://bailian.console.aliyun.com/
+2. 华北2（北京）地域 → 模型服务 → API-KEY 管理
+3. 创建 API Key，复制粘贴到下方`
 
 // 提示速创 API 获取方式
 const suochuangHelp = `1. 注册 https://api.wuyinkeji.com/ 获取 API Key
@@ -57,13 +64,43 @@ loadProxyConfig()
         请选择数字人服务模式：
       </p>
       <select v-model="proxyConfig.providerMode" class="mode-select">
-        <option value="suochuang">🎬 速创 API（0.01元/秒，成功才计费）</option>
+        <option value="aliyun">☁️ 阿里云 VideoRetalk（¥4.8/分钟，新号30分钟免费）</option>
+        <option value="suochuang">🎬 速创 API（0.6元/分钟，成功才计费）</option>
         <option value="dedicated">⚙️ 自建 duix（需云卡/Docker）</option>
       </select>
     </div>
 
+    <!-- 阿里云 VideoRetalk 配置 -->
+    <template v-if="isAliyun">
+      <div class="config-tip">
+        <p class="config-tip-lead">
+          ☁️ <strong>阿里云 VideoRetalk 对口型</strong> — ¥0.08/秒（4.8元/分钟），新号有1800秒免费额度
+        </p>
+        <p style="color:#64748b;font-size:11px;margin-top:6px;">{{ aliyunHelp }}</p>
+      </div>
+
+      <label class="config-field">
+        <span>API Key *</span>
+        <input
+          v-model="proxyConfig.aliyunApiKey"
+          type="password"
+          placeholder="从阿里云百炼控制台获取"
+        />
+      </label>
+
+      <label class="config-field">
+        <span>代理地址（通常不变）</span>
+        <input
+          v-model="proxyConfig.baseUrl"
+          type="text"
+          disabled
+          placeholder="http://127.0.0.1:8899"
+        />
+      </label>
+    </template>
+
     <!-- 速创 API 配置 -->
-    <template v-if="isSuochuang">
+    <template v-else-if="isSuochuang">
       <div class="config-tip">
         <p class="config-tip-lead">
           🎬 <strong>速创 API 对口型</strong> — 0.01元/秒（6毛/分钟），成功才计费，无并发限制
