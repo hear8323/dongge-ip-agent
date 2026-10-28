@@ -4,9 +4,9 @@
 
 ## ⬇️ 下载 Windows 版（普通用户看这条，双击即用）
 
-**直接下这个，约 126 MB，免安装：**
+**直接下这个，约 216 MB，免安装：**
 
-👉 **[DonggeIP-Agent-v1.0.1-win-x64.exe](https://github.com/hear8323/dongge-ip-agent/releases/download/1.0.1/DonggeIP-Agent-v1.0.1-win-x64.exe)**
+👉 **[DonggeIP-Agent-v1.0.2-win-x64.exe](https://github.com/hear8323/dongge-ip-agent/releases/download/v1.0.2/DonggeIP-Agent-v1.0.2-win-x64.exe)**
 
 > ⚠️ **别点仓库里的「Code → Download ZIP」**——那是**源代码**（二三十 MB），没有打包好的程序，双击跑不起来。要能用的话，请认准上面那个 `.exe`。
 
@@ -82,12 +82,12 @@
 **九成的「下下来跑不起来」都是下错了文件**——请认准下面的 `.exe`，不要下源码。
 
 1. 打开发布页：[Releases](https://github.com/hear8323/dongge-ip-agent/releases)
-2. 在最新版本（v1.0.1）的 **Assets** 里，点 `DonggeIP-Agent-v1.0.1-win-x64.exe`（约 126 MB）下载
+2. 在最新版本（v1.0.2）的 **Assets** 里，点 `DonggeIP-Agent-v1.0.2-win-x64.exe`（约 216 MB）下载
 3. 双击 exe 即可运行，无需安装
 
 | 你看到的文件 | 能不能直接用 | 说明 |
 | --- | --- | --- |
-| `DonggeIP-Agent-v1.0.1-win-x64.exe` | ✅ 能 | Windows 便携版，双击即用 |
+| `DonggeIP-Agent-v1.0.2-win-x64.exe` | ✅ 能 | Windows 便携版，双击即用 |
 | `Source code (zip)` / `Source code (tar.gz)` | ❌ 不能 | 这是源代码，需要 `npm install` + 打包才能跑，普通用户别下 |
 
 > ⚠️ 仓库主页绿色的「Code」按钮下面的「Download ZIP」也是**源码**，不是程序，请勿下载。
