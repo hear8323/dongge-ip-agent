@@ -12,6 +12,10 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve(root, 'electron/main.ts')
+        },
+        output: {
+          entryFileNames: '[name].cjs',
+          format: 'cjs'
         }
       }
     }

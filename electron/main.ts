@@ -9,6 +9,11 @@ import {
   shell,
   systemPreferences,
 } from "electron";
+
+// Force software rendering to avoid GPU issues on some systems
+app.commandLine.appendSwitch("disable-gpu");
+app.commandLine.appendSwitch("disable-gpu-sandbox");
+app.commandLine.appendSwitch("disable-software-rasterizer");
 import { basename, extname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { resolveFfmpegPath } from "./services/_shared/ffmpeg-path";
@@ -73,7 +78,7 @@ import {
   type MoarkAccountStore,
 } from "./services/moark-account";
 
-const currentDir = fileURLToPath(new URL(".", import.meta.url));
+const currentDir = __dirname;
 const moarkAccountConfigFileName = "moark-account-config.json";
 const copyCreationControllers = new Map<number, AbortController>();
 const creatorAgentControllers = new Map<number, AbortController>();
@@ -577,7 +582,7 @@ function createMainWindow(): void {
     height: 720,
     minWidth: 900,
     minHeight: 600,
-    show: false,
+    show: true,
     title: "Free Super Agent",
     backgroundColor: "#f6f7fb",
     autoHideMenuBar: true,
@@ -592,10 +597,9 @@ function createMainWindow(): void {
   // 隐藏菜单栏（File、Edit、View、Window 等）
   Menu.setApplicationMenu(null);
 
-  // 页面加载完成后最大化再显示，避免出现先小窗再放大的闪烁
+  // 页面加载完成后最大化（窗口已在 show:true 时立即出现，不再依赖 ready-to-show 才显示）
   mainWindow.once("ready-to-show", () => {
     mainWindow.maximize();
-    mainWindow.show();
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {

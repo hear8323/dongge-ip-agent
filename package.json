@@ -5,7 +5,7 @@
   "description": "超级IP智能体 - 开源免费版",
   "author": "武沛齐",
   "type": "module",
-  "main": "./out/main/index.js",
+  "main": "./out/main/index.cjs",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
